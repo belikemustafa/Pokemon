@@ -1,0 +1,1787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PokéSpotle — Pokédex &amp; Creature Guessing Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    /* ==========================================================================
+       1. DESIGN TOKENS, DARK PALETTES, 12 ACCENTS & 4 FONT PAIRINGS
+       ========================================================================== */
+    :root {
+      --bg-primary: #0b0f19;
+      --bg-secondary: #111726;
+      --bg-card: #141b2b;
+      --bg-card-elevated: #192236;
+      --bg-tile: #1e283d;
+      --bg-tile-hover: #26324c;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-strong: rgba(255, 255, 255, 0.16);
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+
+      --accent: #e11d48;
+      --accent-contrast: #ffffff;
+      --accent-soft: rgba(225, 29, 72, 0.15);
+      --accent-border: rgba(225, 29, 72, 0.48);
+      --accent-glow: rgba(225, 29, 72, 0.18);
+
+      --green-solid: #1eb954;
+      --green-bg: rgba(30, 185, 84, 0.2);
+      --green-border: #22c55e;
+      --yellow-bg: rgba(234, 179, 8, 0.22);
+      --yellow-border: #eab308;
+      --danger: #ef4444;
+
+      --font-display: 'Cinzel', 'Playfair Display', Georgia, serif;
+      --font-serif: 'Playfair Display', Georgia, serif;
+      --font-body: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
+
+      --shadow-card: 0 18px 42px rgba(0, 0, 0, 0.55);
+    }
+
+    body[data-palette="obsidian"] {
+      --bg-primary: #020305;
+      --bg-secondary: #07080c;
+      --bg-card: #0c0e14;
+      --bg-card-elevated: #12151e;
+      --bg-tile: #161a24;
+      --bg-tile-hover: #1f2433;
+      --border-subtle: rgba(255, 255, 255, 0.09);
+      --border-strong: rgba(255, 255, 255, 0.2);
+      --text-primary: #ffffff;
+      --text-secondary: #9ca3af;
+      --text-muted: #6b7280;
+      --shadow-card: 0 18px 42px rgba(0, 0, 0, 0.85);
+    }
+
+    body[data-palette="abyssal"] {
+      --bg-primary: #05070a;
+      --bg-secondary: #090c11;
+      --bg-card: #0e1219;
+      --bg-card-elevated: #141923;
+      --bg-tile: #19202c;
+      --bg-tile-hover: #222b3b;
+      --border-subtle: rgba(148, 163, 184, 0.1);
+      --border-strong: rgba(148, 163, 184, 0.22);
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --shadow-card: 0 18px 44px rgba(0, 0, 0, 0.88);
+    }
+
+    body[data-palette="shadow"] {
+      --bg-primary: #06050b;
+      --bg-secondary: #0b0914;
+      --bg-card: #110e1e;
+      --bg-card-elevated: #171329;
+      --bg-tile: #1e1934;
+      --bg-tile-hover: #282144;
+      --border-subtle: rgba(196, 181, 253, 0.11);
+      --border-strong: rgba(196, 181, 253, 0.22);
+      --text-primary: #f5f3ff;
+      --text-secondary: #a5b4fc;
+      --text-muted: #6366f1;
+      --shadow-card: 0 18px 44px rgba(2, 1, 8, 0.88);
+    }
+
+    body[data-palette="velvet"] {
+      --bg-primary: #0d050c;
+      --bg-secondary: #150814;
+      --bg-card: #1d0c1c;
+      --bg-card-elevated: #261024;
+      --bg-tile: #30142d;
+      --bg-tile-hover: #3e1b3a;
+      --border-subtle: rgba(244, 214, 230, 0.12);
+      --border-strong: rgba(244, 214, 230, 0.24);
+      --text-primary: #fdf8f5;
+      --text-secondary: #d8bfd0;
+      --text-muted: #9e8196;
+      --shadow-card: 0 18px 42px rgba(6, 1, 6, 0.82);
+    }
+
+    body[data-palette="ivory"] {
+      --bg-primary: #f6f2e9;
+      --bg-secondary: #ede7da;
+      --bg-card: #ffffff;
+      --bg-card-elevated: #faf7f0;
+      --bg-tile: #f2ece0;
+      --bg-tile-hover: #e8e0cf;
+      --border-subtle: rgba(28, 25, 23, 0.1);
+      --border-strong: rgba(28, 25, 23, 0.2);
+      --text-primary: #1c1917;
+      --text-secondary: #57534e;
+      --text-muted: #78716c;
+      --shadow-card: 0 12px 30px rgba(28, 25, 23, 0.08);
+    }
+
+    /* 12 Curated Accent Shades */
+    body[data-accent="crimson"] { --accent: #e11d48; --accent-contrast: #ffffff; --accent-soft: rgba(225,29,72,0.15); --accent-border: rgba(225,29,72,0.48); --accent-glow: rgba(225,29,72,0.18); }
+    body[data-accent="gold"] { --accent: #eab308; --accent-contrast: #0b0f19; --accent-soft: rgba(234,179,8,0.14); --accent-border: rgba(234,179,8,0.48); --accent-glow: rgba(234,179,8,0.16); }
+    body[data-accent="coral"] { --accent: #f97316; --accent-contrast: #0b0f19; --accent-soft: rgba(249,115,22,0.15); --accent-border: rgba(249,115,22,0.48); --accent-glow: rgba(249,115,22,0.16); }
+    body[data-accent="cobalt"] { --accent: #3b82f6; --accent-contrast: #ffffff; --accent-soft: rgba(59,130,246,0.15); --accent-border: rgba(59,130,246,0.48); --accent-glow: rgba(59,130,246,0.18); }
+    body[data-accent="emerald"] { --accent: #10b981; --accent-contrast: #062118; --accent-soft: rgba(16,185,129,0.15); --accent-border: rgba(16,185,129,0.48); --accent-glow: rgba(16,185,129,0.16); }
+    body[data-accent="amethyst"] { --accent: #a855f7; --accent-contrast: #ffffff; --accent-soft: rgba(168,85,247,0.15); --accent-border: rgba(168,85,247,0.48); --accent-glow: rgba(168,85,247,0.18); }
+    body[data-accent="rose"] { --accent: #ec4899; --accent-contrast: #ffffff; --accent-soft: rgba(236,72,153,0.15); --accent-border: rgba(236,72,153,0.48); --accent-glow: rgba(236,72,153,0.18); }
+    body[data-accent="teal"] { --accent: #14b8a6; --accent-contrast: #04201d; --accent-soft: rgba(20,184,166,0.15); --accent-border: rgba(20,184,166,0.48); --accent-glow: rgba(20,184,166,0.16); }
+    body[data-accent="copper"] { --accent: #d97706; --accent-contrast: #ffffff; --accent-soft: rgba(217,119,6,0.15); --accent-border: rgba(217,119,6,0.48); --accent-glow: rgba(217,119,6,0.16); }
+    body[data-accent="sapphire"] { --accent: #6366f1; --accent-contrast: #ffffff; --accent-soft: rgba(99,102,241,0.15); --accent-border: rgba(99,102,241,0.48); --accent-glow: rgba(99,102,241,0.18); }
+    body[data-accent="ruby"] { --accent: #dc2626; --accent-contrast: #ffffff; --accent-soft: rgba(220,38,38,0.15); --accent-border: rgba(220,38,38,0.48); --accent-glow: rgba(220,38,38,0.18); }
+    body[data-accent="silver"] { --accent: #cbd5e1; --accent-contrast: #0f172a; --accent-soft: rgba(203,213,225,0.15); --accent-border: rgba(203,213,225,0.48); --accent-glow: rgba(203,213,225,0.15); }
+
+    /* 4 Classic Font Pairings */
+    body[data-font="marquee"] { --font-display: 'Cinzel', 'Playfair Display', serif; --font-serif: 'Playfair Display', serif; --font-body: 'Plus Jakarta Sans', 'Inter', sans-serif; }
+    body[data-font="editorial"] { --font-display: 'Cormorant Garamond', Georgia, serif; --font-serif: 'Playfair Display', Georgia, serif; --font-body: 'Inter', system-ui, sans-serif; }
+    body[data-font="modern"] { --font-display: 'Playfair Display', Georgia, serif; --font-serif: 'Playfair Display', Georgia, serif; --font-body: 'Plus Jakarta Sans', 'Inter', sans-serif; }
+    body[data-font="silverscreen"] { --font-display: 'Cinzel', Georgia, serif; --font-serif: 'Cormorant Garamond', Georgia, serif; --font-body: 'Inter', system-ui, sans-serif; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      min-height: 100%;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      line-height: 1.45;
+      overflow-x: hidden;
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+
+    body.cinema-glow::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background:
+        radial-gradient(ellipse 68% 45% at 50% 0%, var(--accent-glow), transparent 72%),
+        radial-gradient(circle at 50% 50%, transparent 58%, rgba(0, 0, 0, 0.42) 100%);
+    }
+
+    .app-shell {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px 16px 64px;
+    }
+
+    /* ==========================================================================
+       2. MINIMALIST TOP CORNER BAR
+       ========================================================================== */
+    .minimal-top-bar {
+      width: 100%;
+      max-width: 1280px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 22px;
+    }
+
+    .top-bar-group { display: flex; align-items: center; gap: 10px; }
+
+    .icon-circle-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: var(--bg-card);
+      border: 1px solid var(--border-strong);
+      color: var(--text-secondary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+      transition: border-color 0.16s ease, color 0.16s ease, background 0.16s ease, transform 0.14s ease;
+    }
+    .icon-circle-btn:hover {
+      border-color: var(--accent);
+      color: var(--text-primary);
+      background: var(--bg-card-elevated);
+      transform: translateY(-1px);
+    }
+    .icon-circle-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+
+    .mini-dot-badge {
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      min-width: 17px;
+      height: 17px;
+      padding: 0 4px;
+      border-radius: 999px;
+      background: var(--accent);
+      color: var(--accent-contrast);
+      font-size: 0.65rem;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ==========================================================================
+       3. CENTERED STAGE COLUMN
+       ========================================================================== */
+    .center-stage-col {
+      width: 100%;
+      max-width: 650px;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .stage-hud-row {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .stage-hud-left { display: flex; justify-content: flex-start; }
+    .stage-hud-right { display: flex; justify-content: flex-end; }
+
+    .hud-subtle-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 34px;
+      padding: 0 13px;
+      border-radius: 9px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      font-family: var(--font-body);
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .hud-subtle-pill:hover:not(:disabled) { border-color: var(--accent-border); color: var(--text-primary); background: var(--bg-card-elevated); }
+    .hud-subtle-pill.ready { border-color: var(--accent-border); color: var(--accent); }
+    .hud-subtle-pill:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    .guess-status-center { font-size: 0.88rem; font-weight: 600; color: var(--text-secondary); text-align: center; white-space: nowrap; }
+    .guess-status-center .accent-num { color: var(--accent); font-weight: 800; }
+
+    .search-input-shell { position: relative; display: flex; align-items: center; margin-bottom: 18px; }
+
+    .spotle-search-input {
+      width: 100%;
+      height: 48px;
+      padding: 0 46px 0 18px;
+      border-radius: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-strong);
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      font-size: 0.92rem;
+      font-weight: 500;
+      outline: none;
+      transition: border-color 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+    }
+    .spotle-search-input::placeholder { color: var(--text-muted); }
+    .spotle-search-input:focus { border-color: var(--accent-border); background: var(--bg-card-elevated); box-shadow: 0 0 0 3px var(--accent-glow); }
+    .spotle-search-input:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    .search-right-icon { position: absolute; right: 16px; color: var(--text-muted); display: flex; align-items: center; pointer-events: none; }
+    .search-right-icon svg { width: 17px; height: 17px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+    .autocomplete-dropdown {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      right: 0;
+      background: var(--bg-card-elevated);
+      border: 1px solid var(--accent-border);
+      border-radius: 12px;
+      max-height: 300px;
+      overflow-y: auto;
+      z-index: 60;
+      box-shadow: 0 22px 48px rgba(0, 0, 0, 0.78);
+      display: none;
+    }
+    .autocomplete-dropdown.open { display: block; }
+
+    .ac-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 15px;
+      border-bottom: 1px solid var(--border-subtle);
+      cursor: pointer;
+    }
+    .ac-row:last-child { border-bottom: none; }
+    .ac-row:hover, .ac-row.highlighted { background: var(--accent-soft); }
+    .ac-row-title { font-weight: 700; font-size: 0.9rem; color: var(--text-primary); text-transform: capitalize; }
+    .ac-row-sub { font-size: 0.75rem; color: var(--text-secondary); }
+    .ac-row-badge {
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: var(--bg-tile);
+      border: 1px solid var(--border-subtle);
+      color: var(--accent);
+      white-space: nowrap;
+    }
+
+    /* ==========================================================================
+       4. LEFT MENU DRAWER (PokéSpotle Generation & Tier Filters)
+       ========================================================================== */
+    .left-drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(3, 6, 14, 0.76);
+      backdrop-filter: blur(6px);
+      display: none;
+      justify-content: flex-start;
+      z-index: 115;
+    }
+    .left-drawer-backdrop.open { display: flex; }
+
+    .left-menu-drawer {
+      width: 100%;
+      max-width: 390px;
+      height: 100%;
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border-strong);
+      padding: 22px 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .menu-brand-row { display: flex; align-items: center; justify-content: space-between; padding-bottom: 14px; border-bottom: 1px solid var(--border-subtle); }
+    .brand-lockup { display: flex; align-items: center; gap: 11px; }
+    .brand-emblem {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      border: 1.5px solid var(--accent-border);
+      background: var(--bg-card);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 0.9rem;
+      color: var(--accent);
+    }
+    .brand-title { font-family: var(--font-display); font-size: 1.15rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; }
+    .brand-subtitle { font-size: 0.66rem; font-weight: 700; letter-spacing: 0.13em; text-transform: uppercase; color: var(--accent); }
+
+    .menu-field-group { display: flex; flex-direction: column; gap: 6px; }
+    .menu-field-label { font-size: 0.71rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-secondary); }
+
+    .studio-select-wrap { position: relative; display: flex; align-items: center; width: 100%; }
+    .studio-select {
+      width: 100%;
+      appearance: none;
+      -webkit-appearance: none;
+      min-height: 42px;
+      padding: 0 36px 0 14px;
+      border-radius: 11px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-strong);
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      font-weight: 700;
+      font-size: 0.86rem;
+      cursor: pointer;
+      outline: none;
+    }
+    .studio-select:hover, .studio-select:focus { border-color: var(--accent); }
+    .studio-select option { background: var(--bg-secondary); color: var(--text-primary); }
+    .select-chevron { position: absolute; right: 13px; pointer-events: none; color: var(--accent); font-size: 0.78rem; font-weight: 800; }
+
+    .studio-pill-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      min-height: 40px;
+      padding: 8px 14px;
+      border-radius: 11px;
+      border: 1px solid var(--border-strong);
+      background: var(--bg-card);
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      font-size: 0.83rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.14s ease;
+    }
+    .studio-pill-btn:hover { border-color: var(--accent); background: var(--bg-card-elevated); }
+    .studio-pill-btn.accent-solid { background: var(--accent); color: var(--accent-contrast); border-color: var(--accent); }
+
+    .filter-drawer-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 13px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .filter-slot-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+    .slot-label-text { font-weight: 700; font-size: 0.82rem; }
+    .slot-status-pill { font-size: 0.69rem; font-weight: 700; color: var(--accent); background: var(--accent-soft); padding: 2px 8px; border-radius: 6px; }
+    .filter-pills-wrap { display: flex; flex-wrap: wrap; gap: 5px; }
+
+    .mini-filter-pill {
+      padding: 4px 10px;
+      min-height: 29px;
+      border-radius: 999px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      font-family: var(--font-body);
+      font-size: 0.74rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .mini-filter-pill:hover { border-color: var(--accent-border); color: var(--text-primary); }
+    .mini-filter-pill.active { background: var(--accent); border-color: var(--accent); color: var(--accent-contrast); }
+
+    /* ==========================================================================
+       5. POKÉMON GUESS CARDS (Official Artwork Left + 5-Tile Matrix Right)
+       ========================================================================== */
+    .guess-stack { display: flex; flex-direction: column; gap: 14px; }
+
+    .spotle-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-strong);
+      border-radius: 16px;
+      padding: 16px 18px;
+      box-shadow: var(--shadow-card);
+      animation: cardSlideIn 0.24s ease-out;
+    }
+    .spotle-card.exact-win { border: 1.5px solid var(--green-border); box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.16), var(--shadow-card); }
+    @keyframes cardSlideIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+
+    .card-upper-split {
+      display: grid;
+      grid-template-columns: 136px 1fr;
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .media-poster-box {
+      width: 136px;
+      height: 136px;
+      border-radius: 12px;
+      background: var(--bg-tile);
+      border: 1px solid var(--border-subtle);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1.4rem;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+    .media-poster-box img { width: 100%; height: 100%; object-fit: contain; padding: 6px; display: block; }
+
+    .card-right-main { display: flex; flex-direction: column; justify-content: space-between; min-width: 0; }
+    .card-entity-title { font-family: var(--font-body); font-size: 1.24rem; font-weight: 800; color: var(--text-primary); line-height: 1.2; margin-bottom: 6px; text-transform: capitalize; }
+
+    .genre-pills-row { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+    .genre-chip { font-size: 0.71rem; font-weight: 600; padding: 3px 10px; border-radius: 999px; background: var(--bg-tile); border: 1px solid var(--border-subtle); color: var(--text-secondary); }
+    .genre-chip.exact { background: var(--green-bg); border-color: var(--green-border); color: #4ade80; }
+    body[data-palette="ivory"] .genre-chip.exact { color: #15803d; }
+
+    .reference-tiles-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 0.92fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 7px;
+      flex: 1;
+    }
+
+    .s-tile {
+      border-radius: 9px;
+      background: var(--bg-tile);
+      border: 1px solid var(--border-subtle);
+      padding: 7px 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      min-height: 54px;
+    }
+    .s-tile.span-2-rows { grid-column: 3; grid-row: 1 / span 2; }
+    .s-tile.exact { background: #1eb954; border-color: #22c55e; color: #ffffff; }
+    body[data-palette="ivory"] .s-tile.exact { background: #16a34a; color: #ffffff; }
+    .s-tile.close { background: var(--yellow-bg); border-color: var(--yellow-border); }
+
+    .s-tile-lbl { font-size: 0.59rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); margin-bottom: 3px; }
+    .s-tile.exact .s-tile-lbl { color: rgba(255, 255, 255, 0.9); }
+    .s-tile.close .s-tile-lbl { color: var(--text-primary); opacity: 0.85; }
+    .s-tile-val { font-size: 0.85rem; font-weight: 800; line-height: 1.2; word-break: break-word; }
+
+    .studio-emblem-badge {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 1.5px solid currentColor;
+      opacity: 0.88;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: 0.78rem;
+      font-weight: 800;
+      margin: 2px 0 4px;
+    }
+
+    /* ==========================================================================
+       6. PROGRESS BAR, TIP CARD, AUDIO PLAYER & MODALS
+       ========================================================================== */
+    .guess-segments-bar { display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px; margin: 16px 0 12px; }
+    .guess-seg { height: 3.5px; border-radius: 999px; background: var(--border-strong); transition: background 0.2s ease; }
+    .guess-seg.done { background: var(--text-secondary); }
+    .guess-seg.won { background: #22c55e; }
+    .guess-seg.active { background: var(--accent); }
+
+    .tip-carousel-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 15px 18px; margin-bottom: 16px; }
+    .tip-carousel-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+    .tip-nav-btn { width: 28px; height: 28px; border-radius: 8px; background: transparent; border: 1px solid transparent; color: var(--text-muted); font-size: 0.9rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+    .tip-nav-btn:hover { border-color: var(--border-strong); color: var(--text-primary); }
+    .tip-title-wrap { display: flex; align-items: center; gap: 8px; font-size: 0.84rem; font-weight: 700; color: var(--text-primary); }
+    .tip-kicker { font-size: 0.65rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); }
+    .tip-body-text { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 10px; }
+    .tip-legend-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding-top: 9px; border-top: 1px solid var(--border-subtle); font-size: 0.77rem; color: var(--text-secondary); }
+    .tip-legend-item { display: flex; align-items: center; gap: 7px; }
+
+    .bottom-howto-link { align-self: center; background: none; border: none; color: var(--text-muted); font-family: var(--font-body); font-size: 0.78rem; font-weight: 600; cursor: pointer; padding: 4px 10px; }
+    .bottom-howto-link:hover { color: var(--text-primary); }
+
+    .timer-bar-panel, .revealed-clues-banner, .ost-player-panel {
+      display: none;
+      padding: 11px 15px;
+      margin-bottom: 14px;
+      border-radius: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--accent-border);
+    }
+    .timer-bar-panel.active, .ost-player-panel.active { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+    .revealed-clues-banner.active { display: flex; flex-direction: column; gap: 7px; }
+    .timer-readout { font-size: 1.15rem; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--accent); }
+    .timer-readout.urgent { color: var(--danger); }
+
+    .clue-item-line { font-size: 0.83rem; color: var(--text-primary); display: flex; align-items: flex-start; gap: 8px; }
+    .clue-item-tag { font-size: 0.68rem; font-weight: 800; text-transform: uppercase; padding: 2px 7px; border-radius: 6px; background: var(--accent-soft); border: 1px solid var(--accent-border); color: var(--accent); white-space: nowrap; margin-top: 1px; }
+
+    .eq-bars { display: inline-flex; align-items: flex-end; gap: 3px; height: 15px; }
+    .eq-bar { width: 3px; height: 5px; background: var(--accent); border-radius: 2px; }
+    .eq-bars.playing .eq-bar { animation: eqBounce 0.55s infinite alternate; }
+    .eq-bars.playing .eq-bar:nth-child(2) { animation-delay: 0.15s; }
+    .eq-bars.playing .eq-bar:nth-child(3) { animation-delay: 0.3s; }
+    .eq-bars.playing .eq-bar:nth-child(4) { animation-delay: 0.1s; }
+    @keyframes eqBounce { from { height: 4px; } to { height: 15px; } }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(3, 6, 14, 0.82);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 120;
+    }
+    .modal-overlay.open { display: flex; }
+
+    .modal-dialog {
+      width: 100%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+      border-radius: 22px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-strong);
+      padding: 24px;
+      box-shadow: 0 30px 70px rgba(0, 0, 0, 0.78);
+    }
+    .modal-dialog.settings-wide { max-width: 820px; }
+
+    .settings-modal-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      padding-bottom: 16px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .settings-modal-title { font-family: var(--font-serif); font-size: 1.55rem; font-weight: 800; }
+    .settings-modal-sub { font-size: 0.83rem; color: var(--text-secondary); margin-top: 3px; }
+
+    .circle-close-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--bg-card);
+      border: 1px solid var(--border-strong);
+      color: var(--text-primary);
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .circle-close-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    .settings-sec-label { font-size: 0.73rem; font-weight: 800; letter-spacing: 0.09em; text-transform: uppercase; color: var(--accent); margin: 18px 0 10px; }
+    .settings-sec-label:first-of-type { margin-top: 0; }
+
+    .palette-grid-2x2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .palette-card { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 14px; background: var(--bg-card); border: 1.5px solid var(--border-subtle); color: var(--text-primary); text-align: left; cursor: pointer; }
+    .palette-card.active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+    .palette-swatch-box { width: 34px; height: 34px; border-radius: 9px; border: 1px solid rgba(255, 255, 255, 0.16); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .palette-swatch-ring { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid var(--accent); }
+    .palette-name { font-weight: 700; font-size: 0.88rem; }
+    .palette-desc { font-size: 0.73rem; color: var(--text-secondary); }
+
+    .accents-grid-4x3 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; }
+    .accent-pill-card { display: flex; align-items: center; gap: 9px; padding: 10px 12px; border-radius: 12px; background: var(--bg-card); border: 1.5px solid var(--border-subtle); color: var(--text-primary); font-family: var(--font-body); font-size: 0.8rem; font-weight: 700; cursor: pointer; }
+    .accent-pill-card.active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+    .accent-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; }
+
+    .font-grid-2x2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .font-card { padding: 13px 15px; border-radius: 14px; background: var(--bg-card); border: 1.5px solid var(--border-subtle); color: var(--text-primary); text-align: left; cursor: pointer; }
+    .font-card.active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+    .font-card-sample { font-size: 1.02rem; font-weight: 800; margin-bottom: 3px; }
+    .font-card-sub { font-size: 0.74rem; color: var(--text-secondary); }
+
+    .settings-box-panel { margin-top: 14px; padding: 14px 16px; border-radius: 15px; background: var(--bg-card); border: 1px solid var(--border-subtle); }
+    .settings-box-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .status-pill-green { font-size: 0.72rem; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: rgba(16, 185, 129, 0.14); border: 1px solid rgba(16, 185, 129, 0.45); color: #34d399; }
+    .key-input-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .studio-text-input { flex: 1; min-width: 210px; min-height: 40px; padding: 8px 13px; border-radius: 11px; background: var(--bg-primary); border: 1px solid var(--border-strong); color: var(--text-primary); font-family: var(--font-body); font-size: 0.83rem; outline: none; }
+    .studio-text-input:focus { border-color: var(--accent); }
+
+    .hint-choice-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border-radius: 13px; background: var(--bg-card); border: 1px solid var(--border-subtle); margin-bottom: 9px; cursor: pointer; }
+    .hint-choice-row:hover:not(.used) { border-color: var(--accent); background: var(--bg-card-elevated); }
+    .hint-choice-row.used { opacity: 0.5; cursor: not-allowed; }
+
+    .drawer-backdrop { position: fixed; inset: 0; background: rgba(3, 6, 14, 0.76); backdrop-filter: blur(6px); display: none; justify-content: flex-end; z-index: 115; }
+    .drawer-backdrop.open { display: flex; }
+    .guide-drawer { width: 100%; max-width: 440px; height: 100%; background: var(--bg-secondary); border-left: 1px solid var(--border-strong); padding: 24px; overflow-y: auto; }
+
+    .stats-4-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 14px 0 18px; }
+    .stat-box { padding: 11px 6px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-subtle); text-align: center; }
+    .stat-num { font-size: 1.25rem; font-weight: 800; color: var(--accent); }
+    .stat-lbl { font-size: 0.66rem; text-transform: uppercase; color: var(--text-secondary); letter-spacing: 0.05em; }
+
+    .studio-toast {
+      position: fixed;
+      bottom: 22px;
+      left: 50%;
+      transform: translateX(-50%) translateY(90px);
+      background: var(--bg-card-elevated);
+      border: 1.5px solid var(--accent);
+      color: var(--text-primary);
+      padding: 10px 18px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      box-shadow: 0 16px 38px rgba(0, 0, 0, 0.7);
+      z-index: 160;
+      opacity: 0;
+      pointer-events: none;
+      transition: transform 0.25s ease, opacity 0.25s ease;
+    }
+    .studio-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    @media (max-width: 640px) {
+      .card-upper-split { grid-template-columns: 1fr; }
+      .media-poster-box { width: 100%; height: 150px; }
+      .reference-tiles-grid { grid-template-columns: repeat(2, 1fr); grid-template-rows: auto; }
+      .s-tile.span-2-rows { grid-column: 1 / -1; grid-row: auto; }
+      .tip-legend-grid { grid-template-columns: 1fr; }
+      .accents-grid-4x3 { grid-template-columns: repeat(2, 1fr); }
+      .palette-grid-2x2, .font-grid-2x2 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body class="cinema-glow" data-palette="midnight" data-accent="crimson" data-font="marquee">
+  <div class="app-shell">
+    <!-- Top Corner Navigation -->
+    <nav class="minimal-top-bar" aria-label="PokéSpotle Navigation">
+      <div class="top-bar-group">
+        <button class="icon-circle-btn" id="btnOpenLeftMenu" title="Play Mode & Generation Filter">
+          <svg viewBox="0 0 24 24"><line x1="4" y1="7" x2="20" y2="7"></line><line x1="4" y1="12" x2="20" y2="12"></line><line x1="4" y1="17" x2="20" y2="17"></line></svg>
+          <span class="mini-dot-badge" id="filterActiveChip" style="display: none;">0</span>
+        </button>
+      </div>
+
+      <div class="top-bar-group">
+        <button class="icon-circle-btn" id="btnViewRoundSummary" title="View Round Summary" style="display: none;">
+          <svg viewBox="0 0 24 24"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>
+        </button>
+        <button class="icon-circle-btn" id="btnOpenSettings" title="Settings & Stadium Style">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        </button>
+        <button class="icon-circle-btn" id="btnOpenGuideDrawer" title="Stats & How to Play">
+          <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Centered Stage Column -->
+    <div class="center-stage-col">
+      <div class="stage-hud-row">
+        <div class="stage-hud-left">
+          <button class="hud-subtle-pill ready" id="btnHintTrigger" title="Hints, Google Search AI Clue & 5th-Guess Theme">
+            <span id="hintBtnIcon">💡</span>
+            <span id="hintBtnLabel">Hints (0/3)</span>
+          </button>
+        </div>
+
+        <div class="guess-status-center" id="spotleGuessHeader">
+          Guess <span class="accent-num">1</span> of 10
+        </div>
+
+        <div class="stage-hud-right">
+          <button class="hud-subtle-pill" id="btnGiveUp">
+            <span>🏳️</span>
+            <span>Give up</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="search-input-shell">
+        <input
+          type="text"
+          id="mainSearchInput"
+          class="spotle-search-input"
+          placeholder="Search any Pokémon (Gen 1–9)..."
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <span class="search-right-icon">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        </span>
+        <div class="autocomplete-dropdown" id="searchDropdown"></div>
+      </div>
+
+      <section class="timer-bar-panel" id="timerBarPanel">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 0.8rem; font-weight: 700;">⏱️ Time:</span>
+          <span class="timer-readout" id="timerDisplay">01:30</span>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 5px;">
+          <button class="mini-filter-pill preset-sec-btn" data-sec="60">60s</button>
+          <button class="mini-filter-pill preset-sec-btn" data-sec="90">90s</button>
+          <button class="mini-filter-pill preset-sec-btn" data-sec="120">120s</button>
+          <input type="number" id="customSecondsInput" min="15" max="900" value="90" style="width: 58px; height: 29px; border-radius: 7px; background: var(--bg-primary); border: 1px solid var(--border-strong); color: var(--text-primary); text-align: center; font-weight: 700; font-size: 0.76rem;" />
+          <button class="studio-pill-btn accent-solid" id="btnStartTimerRound" style="min-height: 29px; padding: 3px 10px; font-size: 0.74rem;">Restart</button>
+        </div>
+      </section>
+
+      <section class="revealed-clues-banner" id="revealedCluesBanner"></section>
+
+      <section class="ost-player-panel" id="ostPlayerPanel">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div class="eq-bars" id="ostEqBars">
+            <span class="eq-bar"></span><span class="eq-bar"></span><span class="eq-bar"></span><span class="eq-bar"></span>
+          </div>
+          <span style="font-size: 0.8rem; font-weight: 700;" id="ostStatusLabel">12s Mystery Poké-Theme Synth Ready</span>
+        </div>
+        <div style="display: flex; gap: 6px;">
+          <button class="studio-pill-btn accent-solid" id="btnOstPlay" style="min-height: 30px; padding: 3px 12px; font-size: 0.75rem;">▶ Play</button>
+          <button class="studio-pill-btn" id="btnOstStop" style="min-height: 30px; padding: 3px 10px; font-size: 0.75rem;">⏹ Stop</button>
+        </div>
+      </section>
+
+      <main class="guess-stack" id="guessStack"></main>
+
+      <div class="guess-segments-bar" id="guessSegmentsBar" aria-label="Guess Progress"></div>
+
+      <section class="tip-carousel-card" id="tipCarouselCard">
+        <div class="tip-carousel-top">
+          <button class="tip-nav-btn" id="btnPrevTip" aria-label="Previous Tip">‹</button>
+          <div class="tip-title-wrap">
+            <span class="tip-kicker">TIP</span>
+            <span id="tipHeadingText">Direction Arrows</span>
+          </div>
+          <button class="tip-nav-btn" id="btnNextTip" aria-label="Next Tip">›</button>
+        </div>
+        <div class="tip-body-text" id="tipBodyText">
+          Yellow tiles on Dex #, Generation, and Base Stat Total (BST) include a direction arrow.
+        </div>
+        <div class="tip-legend-grid" id="tipLegendGrid">
+          <div class="tip-legend-item"><span>↑</span><span>The answer has a <strong>higher</strong> Dex #, Gen, or BST</span></div>
+          <div class="tip-legend-item"><span>↓</span><span>The answer has a <strong>lower</strong> Dex #, Gen, or BST</span></div>
+        </div>
+      </section>
+
+      <button class="bottom-howto-link" id="btnBottomHowTo">How to Play</button>
+    </div>
+  </div>
+
+  <!-- Left Menu Drawer (PokéSpotle Generation & Tier Filters) -->
+  <div class="left-drawer-backdrop" id="leftDrawerBackdrop">
+    <aside class="left-menu-drawer">
+      <div class="menu-brand-row">
+        <div class="brand-lockup">
+          <div class="brand-emblem">⚡</div>
+          <div>
+            <div class="brand-title">PokéSpotle</div>
+            <div class="brand-subtitle">Pokédex Studio</div>
+          </div>
+        </div>
+        <button class="circle-close-btn" id="btnCloseLeftMenu" aria-label="Close Menu">✕</button>
+      </div>
+
+      <div class="menu-field-group">
+        <label class="menu-field-label" for="playModeSelect">Play Mode</label>
+        <div class="studio-select-wrap">
+          <select id="playModeSelect" class="studio-select">
+            <option value="endless">♾️ Endless</option>
+            <option value="timelimit">⏱️ Time Limit</option>
+            <option value="challenge">⚔️ Challenge</option>
+          </select>
+          <span class="select-chevron">▾</span>
+        </div>
+      </div>
+
+      <div class="menu-field-group">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+          <button class="studio-pill-btn" id="btnToggleFilterStudio" style="flex: 1; justify-content: space-between;">
+            <span>✦ Filter Pokédex Pool</span>
+            <span id="filterMenuSummaryTag" style="font-size: 0.72rem; color: var(--accent);">Any Gen</span>
+          </button>
+          <button class="studio-pill-btn" id="btnResetPoolFilters" title="Reset Filters" style="padding: 8px 11px;">Reset</button>
+        </div>
+
+        <div class="filter-drawer-box" id="filterStudioCard" style="display: flex; margin-top: 6px;">
+          <div>
+            <div class="filter-slot-header">
+              <span class="slot-label-text">Pokémon Generation</span>
+              <span class="slot-status-pill" id="slot01Status">Any Gen (1–9)</span>
+            </div>
+            <div class="filter-pills-wrap" id="slot01GenPills"></div>
+          </div>
+
+          <div>
+            <div class="filter-slot-header">
+              <span class="slot-label-text">Evolution / Tier</span>
+              <span class="slot-status-pill" id="slot02Status">All</span>
+            </div>
+            <div class="filter-pills-wrap" id="slot02StagePills"></div>
+          </div>
+        </div>
+      </div>
+
+      <button class="studio-pill-btn accent-solid" id="btnNewRandomRound" style="margin-top: 4px;">
+        🎲 New Random Pokémon
+      </button>
+    </aside>
+  </div>
+
+  <!-- Settings & Stadium Style Modal -->
+  <div class="modal-overlay" id="modalSettings">
+    <div class="modal-dialog settings-wide">
+      <div class="settings-modal-header">
+        <div>
+          <h2 class="settings-modal-title">Settings &amp; Stadium Style</h2>
+          <p class="settings-modal-sub">Personalize your dark stadium theme, 12 accent colours, typography &amp; Google Search AI clues</p>
+        </div>
+        <button class="circle-close-btn" data-close="modalSettings" aria-label="Close Settings">✕</button>
+      </div>
+
+      <div class="settings-sec-label">COLOR THEME (6 PALETTES)</div>
+      <div class="palette-grid-2x2">
+        <button class="palette-card active" data-palette-opt="midnight">
+          <div class="palette-swatch-box" style="background: #0b0f19;"><span class="palette-swatch-ring"></span></div>
+          <div><div class="palette-name">Midnight Slate</div><div class="palette-desc">Deep slate stadium default</div></div>
+        </button>
+        <button class="palette-card" data-palette-opt="obsidian">
+          <div class="palette-swatch-box" style="background: #020305;"><span class="palette-swatch-ring"></span></div>
+          <div><div class="palette-name">Pure Obsidian Black</div><div class="palette-desc">True OLED pitch-black arena</div></div>
+        </button>
+        <button class="palette-card" data-palette-opt="abyssal">
+          <div class="palette-swatch-box" style="background: #05070a;"><span class="palette-swatch-ring"></span></div>
+          <div><div class="palette-name">Abyssal Carbon</div><div class="palette-desc">Ultra-dark graphite &amp; charcoal void</div></div>
+        </button>
+        <button class="palette-card" data-palette-opt="shadow">
+          <div class="palette-swatch-box" style="background: #06050b;"><span class="palette-swatch-ring"></span></div>
+          <div><div class="palette-name">Shadow Eclipse</div><div class="palette-desc">Pitch-dark indigo-noir arena</div></div>
+        </button>
+        <button class="palette-card" data-palette-opt="velvet">
+          <div class="palette-swatch-box" style="background: #0d050c;"><span class="palette-swatch-ring"></span></div>
+          <div><div class="palette-name">Velvet Hall</div><div class="palette-desc">Darkest plum-black &amp; warm cream</div></div>
+        </button>
+        <button class="palette-card" data-palette-opt="ivory">
+          <div class="palette-swatch-box" style="background: #f6f2e9;"><span class="palette-swatch-ring"></span></div>
+          <div><div class="palette-name">Matinee Ivory</div><div class="palette-desc">Daylight warm paper &amp; ink</div></div>
+        </button>
+      </div>
+
+      <div class="settings-sec-label">ACCENT COLOUR (12 CURATED SHADES)</div>
+      <div class="accents-grid-4x3">
+        <button class="accent-pill-card active" data-accent-opt="crimson"><span class="accent-dot" style="background:#e11d48;"></span>Poké Crimson</button>
+        <button class="accent-pill-card" data-accent-opt="gold"><span class="accent-dot" style="background:#eab308;"></span>Electric Gold</button>
+        <button class="accent-pill-card" data-accent-opt="coral"><span class="accent-dot" style="background:#f97316;"></span>Blaze Coral</button>
+        <button class="accent-pill-card" data-accent-opt="cobalt"><span class="accent-dot" style="background:#3b82f6;"></span>Torrent Cobalt</button>
+        <button class="accent-pill-card" data-accent-opt="emerald"><span class="accent-dot" style="background:#10b981;"></span>Overgrow Emerald</button>
+        <button class="accent-pill-card" data-accent-opt="amethyst"><span class="accent-dot" style="background:#a855f7;"></span>Shadow Amethyst</button>
+        <button class="accent-pill-card" data-accent-opt="rose"><span class="accent-dot" style="background:#ec4899;"></span>Fairy Rose</button>
+        <button class="accent-pill-card" data-accent-opt="teal"><span class="accent-dot" style="background:#14b8a6;"></span>Dragon Teal</button>
+        <button class="accent-pill-card" data-accent-opt="copper"><span class="accent-dot" style="background:#d97706;"></span>Ground Copper</button>
+        <button class="accent-pill-card" data-accent-opt="sapphire"><span class="accent-dot" style="background:#6366f1;"></span>Sapphire League</button>
+        <button class="accent-pill-card" data-accent-opt="ruby"><span class="accent-dot" style="background:#dc2626;"></span>Ruby Champion</button>
+        <button class="accent-pill-card" data-accent-opt="silver"><span class="accent-dot" style="background:#cbd5e1;"></span>Steel Silver</button>
+      </div>
+
+      <div class="settings-sec-label">CLASSIC FONT PAIRING</div>
+      <div class="font-grid-2x2">
+        <button class="font-card active" data-font-opt="marquee"><div class="font-card-sample" style="font-family: 'Cinzel', serif;">CLASSIC LEAGUE</div><div class="font-card-sub">Cinzel + Playfair + Jakarta</div></button>
+        <button class="font-card" data-font-opt="editorial"><div class="font-card-sample" style="font-family: 'Cormorant Garamond', serif;">Editorial Dex</div><div class="font-card-sub">Cormorant + Playfair + Inter</div></button>
+        <button class="font-card" data-font-opt="modern"><div class="font-card-sample" style="font-family: 'Playfair Display', serif;">Modern Stadium</div><div class="font-card-sub">Playfair + Jakarta Sans</div></button>
+        <button class="font-card" data-font-opt="silverscreen"><div class="font-card-sample" style="font-family: 'Cinzel', serif;">CHAMPION HALL</div><div class="font-card-sub">Cinzel + Cormorant + Inter</div></button>
+      </div>
+
+      <div class="settings-box-panel">
+        <label style="display: flex; align-items: center; justify-content: space-between; gap: 14px; cursor: pointer;">
+          <div>
+            <div style="font-weight: 800; font-size: 0.85rem; letter-spacing: 0.04em;">IMMERSIVE ARENA GLOW &amp; VIGNETTE</div>
+            <div style="font-size: 0.78rem; color: var(--text-secondary);">Dynamic stadium spotlight and subtle vignette</div>
+          </div>
+          <input type="checkbox" id="chkCinemaGlow" checked style="width: 20px; height: 20px; accent-color: var(--accent); cursor: pointer;" />
+        </label>
+      </div>
+
+      <div class="settings-box-panel">
+        <div class="settings-box-top">
+          <div style="font-weight: 800; font-size: 0.82rem; color: var(--accent); letter-spacing: 0.04em;">GOOGLE AI (GEMINI) KEY (OPTIONAL FOR EXTERNAL HOSTING)</div>
+          <span class="status-pill-green" id="geminiKeyStatusBadge">Built-in Workspace AI Active</span>
+        </div>
+        <p style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 5px;">
+          Powers live Google Search Pokédex trivia clues inside the Hints menu. Add a Google AI Studio key if hosting outside this workspace.
+        </p>
+        <div class="key-input-row">
+          <input type="password" id="inputGeminiKeyOverride" class="studio-text-input" placeholder="Optional: Paste Google AI Studio API key (AIza...)..." />
+          <button class="studio-pill-btn accent-solid" id="btnSaveGeminiOverride">Save Gemini Key</button>
+          <button class="studio-pill-btn" id="btnResetGeminiOverride">Clear Key</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hints Modal -->
+  <div class="modal-overlay" id="modalHints">
+    <div class="modal-dialog">
+      <div class="settings-modal-header" style="margin-bottom: 12px; padding-bottom: 12px;">
+        <div>
+          <div class="settings-modal-title" style="font-size: 1.25rem;">💡 Pokédex Hints &amp; Google Search AI Clue</div>
+          <div class="settings-modal-sub">Ask Google AI anytime, unlock subtle clues from Guess 3, or play the 12s theme on Guess 5.</div>
+        </div>
+        <button class="circle-close-btn" data-close="modalHints">✕</button>
+      </div>
+      <div id="hintsOptionList"></div>
+    </div>
+  </div>
+
+  <!-- Challenge Link Modal -->
+  <div class="modal-overlay" id="modalChallenge">
+    <div class="modal-dialog">
+      <div class="settings-modal-header" style="margin-bottom: 12px; padding-bottom: 12px;">
+        <div>
+          <div class="settings-modal-title" style="font-size: 1.25rem;">⚔️ Create Pokémon Challenge Link</div>
+          <div class="settings-modal-sub">Pick any Pokémon from the pool and share an encoded link with friends.</div>
+        </div>
+        <button class="circle-close-btn" data-close="modalChallenge">✕</button>
+      </div>
+      <div class="menu-field-group" style="margin-bottom: 12px;">
+        <label class="menu-field-label" for="challengeTargetSelect">Select Mystery Pokémon</label>
+        <div class="studio-select-wrap">
+          <select id="challengeTargetSelect" class="studio-select"></select>
+          <span class="select-chevron">▾</span>
+        </div>
+      </div>
+      <div class="key-input-row">
+        <input type="text" id="challengeUrlOutput" class="studio-text-input" readonly />
+        <button class="studio-pill-btn accent-solid" id="btnCopyChallengeLink">📋 Copy Link</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Round Summary Modal -->
+  <div class="modal-overlay" id="modalSummary">
+    <div class="modal-dialog">
+      <div class="settings-modal-header" style="margin-bottom: 12px; padding-bottom: 12px;">
+        <div>
+          <div class="settings-modal-title" id="summaryHeadline" style="font-size: 1.35rem;">🎉 Pokémon Caught!</div>
+          <div class="settings-modal-sub">PokéSpotle Pokédex Studio</div>
+        </div>
+        <button class="circle-close-btn" data-close="modalSummary">✕</button>
+      </div>
+      <div id="summaryRevealCard" style="background: var(--bg-card); border: 1px solid var(--border-strong); border-radius: 14px; padding: 14px; margin-bottom: 14px;"></div>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end;">
+        <button class="studio-pill-btn" id="btnShareResultGrid">📤 Copy Result Grid</button>
+        <button class="studio-pill-btn accent-solid" id="btnSummaryNextRound">🎲 Next Random Pokémon</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Drawer: Guide & Stats -->
+  <div class="drawer-backdrop" id="drawerBackdrop">
+    <aside class="guide-drawer">
+      <div class="settings-modal-header" style="margin-bottom: 12px; padding-bottom: 12px;">
+        <div>
+          <div class="settings-modal-title" style="font-size: 1.25rem;">📖 Guide &amp; Session Stats</div>
+          <div class="settings-modal-sub">PokéSpotle — Gen 1 to Gen 9 Guessing Studio</div>
+        </div>
+        <button class="circle-close-btn" id="btnCloseGuideDrawer">✕</button>
+      </div>
+
+      <div class="stats-4-grid" id="statsSummaryGrid"></div>
+
+      <div style="display: flex; flex-direction: column; gap: 10px; font-size: 0.82rem; color: var(--text-secondary);">
+        <div class="settings-box-panel" style="margin-top: 0;">
+          <div style="font-weight: 800; color: var(--text-primary); margin-bottom: 4px;">🟩 Green &amp; 🟨 Yellow Tiles</div>
+          <p><strong>Green</strong> means an exact match on Types, National Dex #, Generation, Home Region, Evolution Stage, or Base Stat Total (BST). <strong>Yellow</strong> shows proximity with <strong>↑</strong> or <strong>↓</strong>.</p>
+        </div>
+        <div class="settings-box-panel" style="margin-top: 0;">
+          <div style="font-weight: 800; color: var(--text-primary); margin-bottom: 4px;">⚡ Complete Gen 1–9 Pokédex Search</div>
+          <p>Search any of the 1,025 Pokémon from Kanto (Gen 1) through Paldea (Gen 9) via live PokéAPI, with official artwork and stats.</p>
+        </div>
+        <div class="settings-box-panel" style="margin-top: 0;">
+          <div style="font-weight: 800; color: var(--text-primary); margin-bottom: 4px;">☰ Generation &amp; Tier Filter</div>
+          <p>Open the top-left <strong>☰ Menu</strong> to lock mystery targets to <strong>Any Gen (1–9)</strong> or specific Generations and Evolution Stages.</p>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <div class="studio-toast" id="studioToast"></div>
+
+  <script>
+    const MAX_GUESSES = 10;
+    const MAX_HINTS = 3;
+    const OST_UNLOCK_AT = 5;
+
+    const Prefs = {
+      palette: 'midnight',
+      accent: 'crimson',
+      font: 'marquee',
+      cinemaGlow: true,
+      pokemonGens: [],
+      stageFilter: 'All',
+      geminiKeyOverride: ''
+    };
+
+    const MediaCache = { entities: {} };
+    const POKEMON_GENS_LIST = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+    const STAGE_FILTERS_LIST = ['All', 'Basic', 'Stage 1', 'Stage 2', 'Legendary'];
+
+    const GEN_BY_DEX = [
+      { max: 151, gen: 1, region: 'Kanto' },
+      { max: 251, gen: 2, region: 'Johto' },
+      { max: 386, gen: 3, region: 'Hoenn' },
+      { max: 493, gen: 4, region: 'Sinnoh' },
+      { max: 649, gen: 5, region: 'Unova' },
+      { max: 721, gen: 6, region: 'Kalos' },
+      { max: 809, gen: 7, region: 'Alola' },
+      { max: 905, gen: 8, region: 'Galar' },
+      { max: 1025, gen: 9, region: 'Paldea' }
+    ];
+
+    function getGenInfoFromDex(dex) {
+      for (const entry of GEN_BY_DEX) {
+        if (dex <= entry.max) return { gen: entry.gen, region: entry.region };
+      }
+      return { gen: 9, region: 'Paldea' };
+    }
+
+    const POKEMON_DB = [
+      { id: 'poke_6', dex: 6, title: 'Charizard', gen: 1, region: 'Kanto', genres: ['Fire', 'Flying'], stage: 'Stage 2', bst: 534, riddle: 'A winged draconic starter whose tail flame intensifies after fierce aerial battles.', taglineWords: ['Draconic', 'Inferno', 'Kanto', 'Starter'], notes: [293.66, 349.23, 440.00, 523.25, 440.00, 392.00, 349.23, 293.66] },
+      { id: 'poke_25', dex: 25, title: 'Pikachu', gen: 1, region: 'Kanto', genres: ['Electric'], stage: 'Stage 1', bst: 320, riddle: 'Cheek pouches store static electricity discharged during sudden lightning storms.', taglineWords: ['Static', 'Cheeks', 'Mascot', 'Volt'], notes: [392.00, 493.88, 587.33, 493.88, 392.00, 440.00, 493.88, 587.33] },
+      { id: 'poke_94', dex: 94, title: 'Gengar', gen: 1, region: 'Kanto', genres: ['Ghost', 'Poison'], stage: 'Stage 2', bst: 500, riddle: 'Hides inside the shadows of travelers at night, causing sudden chills in the surrounding air.', taglineWords: ['Shadow', 'Grin', 'Nocturnal', 'Kanto'], notes: [246.94, 293.66, 311.13, 369.99, 311.13, 293.66, 246.94, 220.00] },
+      { id: 'poke_150', dex: 150, title: 'Mewtwo', gen: 1, region: 'Kanto', genres: ['Psychic'], stage: 'Legendary', bst: 680, riddle: 'Engineered in a secluded island laboratory with unmatched telekinetic focus.', taglineWords: ['Genetic', 'Telekinesis', 'Laboratory', 'Apex'], notes: [220.00, 261.63, 311.13, 392.00, 349.23, 311.13, 261.63, 220.00] },
+      { id: 'poke_197', dex: 197, title: 'Umbreon', gen: 2, region: 'Johto', genres: ['Dark'], stage: 'Stage 1', bst: 525, riddle: 'Golden rings glow across its sleek coat whenever lunar light bathes the night.', taglineWords: ['Moonlight', 'Rings', 'Nocturnal', 'Johto'], notes: [246.94, 293.66, 369.99, 329.63, 293.66, 246.94, 220.00, 246.94] },
+      { id: 'poke_248', dex: 248, title: 'Tyranitar', gen: 2, region: 'Johto', genres: ['Rock', 'Dark'], stage: 'Stage 2', bst: 600, riddle: 'Its armor-plated body can withstand any attack, and its rampages can reshape mountains.', taglineWords: ['Armor', 'Pseudo-Legendary', 'Sandstorm', 'Johto'], notes: [196.00, 233.08, 261.63, 293.66, 261.63, 233.08, 196.00, 174.61] },
+      { id: 'poke_282', dex: 282, title: 'Gardevoir', gen: 3, region: 'Hoenn', genres: ['Psychic', 'Fairy'], stage: 'Stage 2', bst: 518, riddle: 'Senses the feelings of its Trainer and creates small black holes to protect them from danger.', taglineWords: ['Empathy', 'Grace', 'Telekinesis', 'Hoenn'], notes: [329.63, 392.00, 493.88, 523.25, 493.88, 392.00, 329.63, 293.66] },
+      { id: 'poke_384', dex: 384, title: 'Rayquaza', gen: 3, region: 'Hoenn', genres: ['Dragon', 'Flying'], stage: 'Legendary', bst: 680, riddle: 'Descends from the ozone layer to quell titanic clashes between land and sea.', taglineWords: ['Ozone', 'Serpent', 'Stratosphere', 'Hoenn'], notes: [261.63, 329.63, 392.00, 523.25, 493.88, 392.00, 329.63, 261.63] },
+      { id: 'poke_445', dex: 445, title: 'Garchomp', gen: 4, region: 'Sinnoh', genres: ['Dragon', 'Ground'], stage: 'Stage 2', bst: 600, riddle: 'Folds its body and extends its wings to fly like a jet plane at sonic speeds.', taglineWords: ['Supersonic', 'Land Shark', 'Champion', 'Sinnoh'], notes: [220.00, 261.63, 329.63, 440.00, 392.00, 329.63, 261.63, 220.00] },
+      { id: 'poke_448', dex: 448, title: 'Lucario', gen: 4, region: 'Sinnoh', genres: ['Fighting', 'Steel'], stage: 'Stage 1', bst: 525, riddle: 'Reads invisible aura waves emitted by living beings from over half a mile away.', taglineWords: ['Aura', 'Discipline', 'Steel', 'Sinnoh'], notes: [293.66, 329.63, 440.00, 392.00, 329.63, 293.66, 261.63, 293.66] },
+      { id: 'poke_571', dex: 571, title: 'Zoroark', gen: 5, region: 'Unova', genres: ['Dark'], stage: 'Stage 1', bst: 510, riddle: 'Creates lifelike illusions that fool entire crowds to protect its pack in its forest lair.', taglineWords: ['Illusion', 'Trickster', 'Crimson Mane', 'Unova'], notes: [246.94, 293.66, 349.23, 329.63, 293.66, 246.94, 220.00, 246.94] },
+      { id: 'poke_658', dex: 658, title: 'Greninja', gen: 6, region: 'Kalos', genres: ['Water', 'Dark'], stage: 'Stage 2', bst: 530, riddle: 'Compresses pressurized water into razor-sharp throwing stars while vanishing like a shadow.', taglineWords: ['Shuriken', 'Shinobi', 'Torrent', 'Kalos'], notes: [220.00, 293.66, 329.63, 392.00, 329.63, 293.66, 246.94, 220.00] },
+      { id: 'poke_778', dex: 778, title: 'Mimikyu', gen: 7, region: 'Alola', genres: ['Ghost', 'Fairy'], stage: 'Basic', bst: 476, riddle: 'Wears a hand-sewn disguise modeled after a famous mascot to avoid sunlight and win affection.', taglineWords: ['Disguise', 'Lonely', 'Shadow', 'Alola'], notes: [311.13, 349.23, 392.00, 349.23, 311.13, 293.66, 261.63, 246.94] },
+      { id: 'poke_887', dex: 887, title: 'Dragapult', gen: 8, region: 'Galar', genres: ['Dragon', 'Ghost'], stage: 'Stage 2', bst: 600, riddle: 'Launches its younger companions at supersonic Mach speeds from horns along its brow.', taglineWords: ['Stealth', 'Supersonic', 'Spectral', 'Galar'], notes: [261.63, 311.13, 392.00, 466.16, 392.00, 349.23, 311.13, 261.63] },
+      { id: 'poke_937', dex: 937, title: 'Ceruledge', gen: 9, region: 'Paldea', genres: ['Fire', 'Ghost'], stage: 'Stage 1', bst: 525, riddle: 'Blades forged from bitter spectral regrets ignite into fierce ghostly flames in close combat.', taglineWords: ['Blades', 'Spectral', 'Armor', 'Paldea'], notes: [246.94, 293.66, 349.23, 440.00, 392.00, 349.23, 293.66, 246.94] }
+    ];
+
+    const ROTATING_TIPS = [
+      { title: 'Direction Arrows', body: 'Yellow tiles on Dex #, Generation, and Base Stat Total (BST) include a direction arrow.', leftIcon: '↑', leftText: 'The answer has a <strong>higher</strong> Dex #, Gen, or BST', rightIcon: '↓', rightText: 'The answer has a <strong>lower</strong> Dex #, Gen, or BST' },
+      { title: 'Elemental Types & Region', body: 'Matching Type pills (Fire, Water, Ghost, Dragon, etc.) and Home Regions light up in green.', leftIcon: '🟩', leftText: 'Exact match on <strong>Type, Region, or Stage</strong>', rightIcon: '🟨', rightText: 'Within <strong>±1 Gen</strong>, <strong>±100 Dex</strong>, or <strong>±45 BST</strong>' },
+      { title: 'All 1,025 Pokémon Searchable', body: 'Type any Pokémon name from Gen 1 (Kanto) to Gen 9 (Paldea) to fetch live stats and official artwork.', leftIcon: '⚡', leftText: 'Full <strong>Gen 1–9 Pokédex</strong> autocomplete', rightIcon: '🖼️', rightText: 'Official high-res <strong>PokéAPI artwork</strong>' },
+      { title: 'Generation Filter & AI Clues', body: 'Use the left menu (☰) to filter by Any Gen or specific Generations (1–9), or ask Google Search AI for a Pokédex clue.', leftIcon: '💡', leftText: 'Ask <strong>Google Search AI</strong> inside Hints', rightIcon: '🔊', rightText: 'Unlock <strong>12s Theme</strong> on Guess 5' }
+    ];
+
+    let allPokeNamesIndex = [];
+
+    const state = {
+      playMode: 'endless',
+      pokemonGens: [],
+      stageFilter: 'All',
+      target: null,
+      guesses: [],
+      revealedHints: [],
+      lastHintGuessCount: -1,
+      ostUnlocked: false,
+      gameOver: false,
+      won: false,
+      tipIndex: 0,
+      timerSecondsLeft: 90,
+      timerInterval: null,
+      searchResults: [],
+      highlightedIndex: -1,
+      stats: { played: 0, won: 0, streak: 0, maxStreak: 0 }
+    };
+
+    function normalizeStr(s) { return String(s || '').toLowerCase().replace(/[^a-z0-9]/g, ''); }
+    function indexSafeId(id) { return String(id || '').replace(/[^a-zA-Z0-9_]/g, '_'); }
+    function getMonogram(title) { return String(title || '?').slice(0, 2).toUpperCase(); }
+    function compareNum(g, t, windowVal) {
+      if (g === null || g === undefined || t === null || t === undefined) return { cls: 'miss', arrow: '' };
+      const diff = g - t;
+      if (diff === 0) return { cls: 'exact', arrow: '' };
+      return { cls: Math.abs(diff) <= windowVal ? 'close' : 'miss', arrow: diff < 0 ? ' ↑' : ' ↓' };
+    }
+
+    let toastTimer = null;
+    function showToast(msg) {
+      const el = document.getElementById('studioToast');
+      if (!el) return;
+      el.textContent = msg;
+      el.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
+    }
+    function openModal(id) { document.getElementById(id)?.classList.add('open'); }
+    function closeModal(id) { document.getElementById(id)?.classList.remove('open'); }
+
+    const GoogleSearchVerifier = (() => {
+      async function generateGroundedClue(target) {
+        if (!target) return null;
+        const apiKey = Prefs.geminiKeyOverride || '';
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+        const prompt = `You are a Pokémon trivia host for a guessing game. The secret Pokémon is "${target.title}" (National Dex #${target.dex}, ${target.region} region). Use Google Search to find one interesting, accurate, spoiler-free Pokédex or lore clue about it. CRITICAL: Do NOT include the Pokémon's name "${target.title}" in your clue. Keep it under 24 words.`;
+        try {
+          const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], tools: [{ google_search: {} }] })
+          });
+          if (!response.ok) return target.riddle || null;
+          const result = await response.json();
+          const text = result.candidates?.[0]?.content?.parts?.[0]?.text || '';
+          return text ? text.trim() : (target.riddle || null);
+        } catch (_) {
+          return target.riddle || null;
+        }
+      }
+      return { generateGroundedClue };
+    })();
+
+    async function preloadPokeApiIndex() {
+      try {
+        const res = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1025');
+        if (res.ok) {
+          const data = await res.json();
+          allPokeNamesIndex = (data.results || []).map((p, idx) => ({
+            isRemote: true,
+            dex: idx + 1,
+            rawName: p.name,
+            title: p.name.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+          }));
+        }
+      } catch (_) {}
+    }
+
+    async function resolveSelectedPokemon(candidate) {
+      if (!candidate.isRemote) return candidate;
+      const cacheId = `poke_${candidate.dex}`;
+      if (MediaCache.entities[cacheId]) return MediaCache.entities[cacheId];
+
+      try {
+        const [pRes, sRes] = await Promise.all([
+          fetch(`https://pokeapi.co/api/v2/pokemon/${candidate.dex}`),
+          fetch(`https://pokeapi.co/api/v2/pokemon-species/${candidate.dex}`)
+        ]);
+        if (!pRes.ok) return null;
+        const pData = await pRes.json();
+        const sData = sRes.ok ? await sRes.json() : null;
+
+        const types = (pData.types || []).map(t => t.type.name.charAt(0).toUpperCase() + t.type.name.slice(1));
+        const bst = (pData.stats || []).reduce((acc, s) => acc + (s.base_stat || 0), 0);
+        const genInfo = getGenInfoFromDex(candidate.dex);
+
+        let stage = 'Basic';
+        if (sData?.is_legendary || sData?.is_mythical) stage = 'Legendary';
+        else if (sData?.evolves_from_species) stage = 'Stage 1';
+
+        const entity = {
+          id: cacheId,
+          dex: candidate.dex,
+          title: candidate.title,
+          gen: genInfo.gen,
+          region: genInfo.region,
+          genres: types.length ? types : ['Normal'],
+          stage,
+          bst,
+          notes: [293.66, 349.23, 440.00, 392.00, 349.23, 329.63, 293.66, 261.63]
+        };
+        MediaCache.entities[cacheId] = entity;
+        return entity;
+      } catch (_) {}
+      return null;
+    }
+
+    const OstAudio = (() => {
+      let ctx = null, timerIds = [];
+      function stop() {
+        timerIds.forEach(id => clearTimeout(id));
+        timerIds = [];
+        document.getElementById('ostEqBars')?.classList.remove('playing');
+        const lbl = document.getElementById('ostStatusLabel');
+        if (lbl) lbl.textContent = '12s Mystery Poké-Theme Synth Ready';
+      }
+      function play(notes) {
+        stop();
+        const seq = Array.isArray(notes) && notes.length ? notes : [261.63, 329.63, 392.00, 523.25];
+        try {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (!ctx) ctx = new AudioCtx();
+          if (ctx.state === 'suspended') ctx.resume();
+          document.getElementById('ostEqBars')?.classList.add('playing');
+          const lbl = document.getElementById('ostStatusLabel');
+          if (lbl) lbl.textContent = 'Playing 12s Melodic Theme...';
+          const stepSec = 0.72, totalSteps = 16;
+          for (let i = 0; i < totalSteps; i++) {
+            const freq = seq[i % seq.length];
+            const startTime = ctx.currentTime + i * stepSec;
+            const osc = ctx.createOscillator(), gain = ctx.createGain();
+            osc.type = i % 2 === 0 ? 'triangle' : 'sine';
+            osc.frequency.setValueAtTime(freq, startTime);
+            gain.gain.setValueAtTime(0.001, startTime);
+            gain.gain.exponentialRampToValueAtTime(0.14, startTime + 0.06);
+            gain.gain.exponentialRampToValueAtTime(0.001, startTime + stepSec * 0.92);
+            osc.connect(gain); gain.connect(ctx.destination);
+            osc.start(startTime); osc.stop(startTime + stepSec);
+          }
+          timerIds.push(setTimeout(stop, totalSteps * stepSec * 1000 + 150));
+        } catch (_) { showToast('Audio playback blocked by browser.'); }
+      }
+      return { play, stop };
+    })();
+
+    function getFilteredPool() {
+      let list = [...POKEMON_DB];
+      if (state.pokemonGens.length > 0) {
+        const byGen = list.filter(p => state.pokemonGens.includes(p.gen));
+        if (byGen.length) list = byGen;
+      }
+      if (state.stageFilter !== 'All') {
+        const byStage = list.filter(p => p.stage === state.stageFilter);
+        if (byStage.length) list = byStage;
+      }
+      return list;
+    }
+
+    function stopTimer() { if (state.timerInterval) { clearInterval(state.timerInterval); state.timerInterval = null; } }
+    function updateTimerUi() {
+      const el = document.getElementById('timerDisplay');
+      if (!el) return;
+      const mins = Math.floor(Math.max(0, state.timerSecondsLeft) / 60);
+      const secs = Math.max(0, state.timerSecondsLeft) % 60;
+      el.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+      el.classList.toggle('urgent', state.timerSecondsLeft <= 15);
+    }
+    function startTimer() {
+      stopTimer();
+      const inputVal = Number(document.getElementById('customSecondsInput')?.value || 90);
+      state.timerSecondsLeft = Math.max(15, Math.min(900, inputVal || 90));
+      updateTimerUi();
+      state.timerInterval = setInterval(() => {
+        if (state.gameOver || state.playMode !== 'timelimit') { stopTimer(); return; }
+        state.timerSecondsLeft--;
+        updateTimerUi();
+        if (state.timerSecondsLeft <= 0) { stopTimer(); finishRound(false, '⏱️ Time expired!'); }
+      }, 1000);
+    }
+
+    function canTriggerHint() {
+      if (state.gameOver || state.guesses.length < 2 || state.revealedHints.length >= MAX_HINTS) return false;
+      return state.lastHintGuessCount !== state.guesses.length;
+    }
+    function canTriggerOst() { return !state.gameOver && state.guesses.length >= (OST_UNLOCK_AT - 1); }
+
+    function buildClueOptions(target) {
+      if (!target) return [];
+      return [
+        { id: 'clue_riddle', title: '🎭 Spoiler-Free Pokédex Lore Riddle', desc: 'Reveals an entry clue without naming the Pokémon', value: target.riddle || 'A memorable creature from the Pokédex.' },
+        { id: 'clue_tags', title: '🏷️ Lore & Battle Keywords', desc: 'Reveals 3–4 defining traits associated with the Pokémon', value: (target.taglineWords || target.genres || []).join(' • ') },
+        { id: 'clue_region', title: '⚡ Region & Evolution Tier', desc: 'Reveals the home region and evolutionary stage', value: `${target.region} Region (Gen ${target.gen}) • ${target.stage}` }
+      ];
+    }
+
+    function startNewRound(forcedTarget = null) {
+      OstAudio.stop(); stopTimer();
+      const pool = getFilteredPool();
+      let nextTarget = forcedTarget;
+      if (!nextTarget) {
+        const candidates = pool.filter(x => !state.target || x.id !== state.target.id);
+        const pickFrom = candidates.length ? candidates : pool;
+        nextTarget = pickFrom[Math.floor(Math.random() * pickFrom.length)];
+      }
+      state.target = nextTarget;
+      state.guesses = [];
+      state.revealedHints = [];
+      state.lastHintGuessCount = -1;
+      state.ostUnlocked = false;
+      state.gameOver = false;
+      state.won = false;
+      state.searchResults = [];
+      state.highlightedIndex = -1;
+      if (state.playMode === 'timelimit') startTimer();
+      renderAll();
+    }
+
+    function submitGuess(item) {
+      if (!item || state.gameOver) return;
+      if (state.guesses.some(g => g.dex === item.dex || normalizeStr(g.title) === normalizeStr(item.title))) {
+        showToast('Already guessed this Pokémon!'); return;
+      }
+      state.guesses.push(item);
+      if (state.guesses.length >= (OST_UNLOCK_AT - 1)) state.ostUnlocked = true;
+      const isWin = item.dex === state.target.dex || normalizeStr(item.title) === normalizeStr(state.target.title);
+      if (isWin) finishRound(true);
+      else if (state.guesses.length >= MAX_GUESSES) finishRound(false);
+      else renderAll();
+    }
+
+    function finishRound(won, customReason = null) {
+      state.gameOver = true; state.won = won; stopTimer();
+      state.stats.played++;
+      if (won) { state.stats.won++; state.stats.streak++; state.stats.maxStreak = Math.max(state.stats.maxStreak, state.stats.streak); }
+      else state.stats.streak = 0;
+      renderAll();
+      openSummaryModal(customReason);
+    }
+
+    function renderGuessCard(item, index) {
+      const target = state.target;
+      const isExactWin = item.dex === target.dex || normalizeStr(item.title) === normalizeStr(target.title);
+      const posterDomId = `g_poster_${index}_${indexSafeId(item.id)}`;
+
+      const card = document.createElement('article');
+      card.className = `spotle-card${isExactWin ? ' exact-win' : ''}`;
+      const targetGenresNorm = (target.genres || []).map(normalizeStr);
+      const genrePillsHtml = (item.genres || []).map(g => `<span class="genre-chip ${targetGenresNorm.includes(normalizeStr(g)) ? 'exact' : ''}">${g}</span>`).join('');
+
+      const dexCmp = compareNum(item.dex, target.dex, 100);
+      const genCmp = compareNum(item.gen, target.gen, 1);
+      const bstCmp = compareNum(item.bst, target.bst, 45);
+      const stageExact = item.stage === target.stage;
+      const regExact = item.region === target.region;
+
+      card.innerHTML = `<div class="card-upper-split">
+        <div class="media-poster-box" id="${posterDomId}">#${item.dex}</div>
+        <div class="card-right-main">
+          <div><div class="card-entity-title">${item.title}</div><div class="genre-pills-row">${genrePillsHtml}</div></div>
+          <div class="reference-tiles-grid">
+            <div class="s-tile ${dexCmp.cls}"><div class="s-tile-lbl">Dex #</div><div class="s-tile-val">#${item.dex}${dexCmp.arrow}</div></div>
+            <div class="s-tile ${genCmp.cls}"><div class="s-tile-lbl">Generation</div><div class="s-tile-val">Gen ${item.gen}${genCmp.arrow}</div></div>
+            <div class="s-tile span-2-rows ${regExact ? 'exact' : ''}">
+              <div class="s-tile-lbl">Region</div>
+              <div class="studio-emblem-badge">G${item.gen}</div>
+              <div class="s-tile-val" style="font-size: 0.78rem;">${item.region}</div>
+            </div>
+            <div class="s-tile ${stageExact ? 'exact' : ''}"><div class="s-tile-lbl">Stage</div><div class="s-tile-val">${item.stage}</div></div>
+            <div class="s-tile ${bstCmp.cls}"><div class="s-tile-lbl">Base Stat</div><div class="s-tile-val">${item.bst} BST${bstCmp.arrow}</div></div>
+          </div>
+        </div>
+      </div>`;
+
+      const box = card.querySelector(`#${posterDomId}`);
+      if (box && item.dex) {
+        const img = document.createElement('img');
+        img.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${item.dex}.png`;
+        img.alt = item.title;
+        img.onerror = () => { box.textContent = `#${item.dex}`; };
+        box.innerHTML = '';
+        box.appendChild(img);
+      }
+
+      return card;
+    }
+
+    function renderFilterPoolSlots() {
+      const slot01Status = document.getElementById('slot01Status');
+      const slot01Pills = document.getElementById('slot01GenPills');
+      const isAnyGen = state.pokemonGens.length === 0;
+      slot01Status.textContent = isAnyGen ? 'Any Gen (1–9)' : `Gen ${state.pokemonGens.slice().sort().join(', ')}`;
+
+      const anyBtnHtml = `<button class="mini-filter-pill ${isAnyGen ? 'active' : ''}" data-gen-pill="any">Any Gen</button>`;
+      const genBtnsHtml = POKEMON_GENS_LIST.map(g => `<button class="mini-filter-pill ${state.pokemonGens.includes(g) ? 'active' : ''}" data-gen-pill="${g}">Gen ${g}</button>`).join('');
+      slot01Pills.innerHTML = anyBtnHtml + genBtnsHtml;
+
+      slot01Pills.querySelectorAll('[data-gen-pill]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const val = btn.getAttribute('data-gen-pill');
+          if (val === 'any') state.pokemonGens = [];
+          else {
+            const num = Number(val);
+            if (state.pokemonGens.includes(num)) state.pokemonGens = state.pokemonGens.filter(x => x !== num);
+            else state.pokemonGens.push(num);
+          }
+          Prefs.pokemonGens = [...state.pokemonGens];
+          startNewRound();
+          showToast(state.pokemonGens.length ? `⚡ Pool: Gen ${state.pokemonGens.slice().sort().join(', ')}` : '⚡ Pool: Any Gen (1–9)');
+        });
+      });
+
+      const slot02Status = document.getElementById('slot02Status');
+      const slot02Pills = document.getElementById('slot02StagePills');
+      slot02Status.textContent = state.stageFilter;
+      slot02Pills.innerHTML = STAGE_FILTERS_LIST.map(st => `<button class="mini-filter-pill ${state.stageFilter === st ? 'active' : ''}" data-stage-pill="${st}">${st}</button>`).join('');
+      slot02Pills.querySelectorAll('[data-stage-pill]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.stageFilter = btn.getAttribute('data-stage-pill');
+          Prefs.stageFilter = state.stageFilter;
+          startNewRound();
+          showToast(`⚡ Tier Filter: ${state.stageFilter}`);
+        });
+      });
+    }
+
+    function renderTipCarousel() {
+      const tip = ROTATING_TIPS[state.tipIndex % ROTATING_TIPS.length];
+      document.getElementById('tipHeadingText').textContent = tip.title;
+      document.getElementById('tipBodyText').textContent = tip.body;
+      document.getElementById('tipLegendGrid').innerHTML = `
+        <div class="tip-legend-item"><span>${tip.leftIcon}</span><span>${tip.leftText}</span></div>
+        <div class="tip-legend-item"><span>${tip.rightIcon}</span><span>${tip.rightText}</span></div>
+      `;
+    }
+
+    function renderAll() {
+      document.getElementById('playModeSelect').value = state.playMode;
+      const searchInput = document.getElementById('mainSearchInput');
+      searchInput.disabled = state.gameOver;
+
+      let activeFilterCount = 0;
+      if (state.pokemonGens.length > 0) activeFilterCount++;
+      if (state.stageFilter !== 'All') activeFilterCount++;
+      const filterChip = document.getElementById('filterActiveChip');
+      filterChip.style.display = activeFilterCount > 0 ? 'inline-flex' : 'none';
+      filterChip.textContent = activeFilterCount;
+
+      const filterTag = document.getElementById('filterMenuSummaryTag');
+      if (filterTag) {
+        filterTag.textContent = state.pokemonGens.length ? `Gen ${state.pokemonGens.slice().sort().join(',')}` : (state.stageFilter !== 'All' ? state.stageFilter : 'Any Gen');
+      }
+
+      document.getElementById('timerBarPanel').classList.toggle('active', state.playMode === 'timelimit');
+      document.getElementById('btnViewRoundSummary').style.display = state.gameOver ? 'inline-flex' : 'none';
+
+      const currentGuessNum = state.gameOver ? state.guesses.length : Math.min(MAX_GUESSES, state.guesses.length + 1);
+      const headerEl = document.getElementById('spotleGuessHeader');
+      headerEl.innerHTML = state.won ? `Caught in <span class="accent-num">${state.guesses.length}</span> of 10` : state.gameOver ? `Round Over (<span class="accent-num">${state.guesses.length}</span> of 10)` : `Guess <span class="accent-num">${currentGuessNum}</span> of 10`;
+
+      document.getElementById('btnHintTrigger').disabled = state.gameOver;
+      document.getElementById('hintBtnLabel').textContent = `Hints (${state.revealedHints.length}/${MAX_HINTS})`;
+      document.getElementById('ostPlayerPanel').classList.toggle('active', state.ostUnlocked);
+      document.getElementById('btnGiveUp').disabled = state.gameOver;
+
+      renderFilterPoolSlots();
+
+      const cluesBanner = document.getElementById('revealedCluesBanner');
+      if (state.revealedHints.length > 0) {
+        cluesBanner.classList.add('active');
+        cluesBanner.innerHTML = state.revealedHints.map(h => `<div class="clue-item-line"><span class="clue-item-tag">${h.title}</span><span>${h.value}</span></div>`).join('');
+      } else {
+        cluesBanner.classList.remove('active');
+        cluesBanner.innerHTML = '';
+      }
+
+      const stack = document.getElementById('guessStack');
+      stack.innerHTML = '';
+      for (let i = state.guesses.length - 1; i >= 0; i--) stack.appendChild(renderGuessCard(state.guesses[i], i));
+
+      document.getElementById('guessSegmentsBar').innerHTML = Array.from({ length: MAX_GUESSES }, (_, idx) => {
+        let cls = 'guess-seg';
+        if (idx < state.guesses.length) {
+          const g = state.guesses[idx];
+          cls += (g.dex === state.target.dex || normalizeStr(g.title) === normalizeStr(state.target.title)) ? ' won' : ' done';
+        } else if (idx === state.guesses.length && !state.gameOver) cls += ' active';
+        return `<span class="${cls}"></span>`;
+      }).join('');
+
+      renderTipCarousel();
+    }
+
+    function renderAutocompleteDropdown() {
+      const dd = document.getElementById('searchDropdown');
+      if (!state.searchResults.length) { dd.classList.remove('open'); dd.innerHTML = ''; return; }
+      dd.innerHTML = state.searchResults.map((item, idx) => {
+        const genInfo = item.gen ? { gen: item.gen, region: item.region } : getGenInfoFromDex(item.dex);
+        const subText = `National Dex #${item.dex} • Gen ${genInfo.gen} (${genInfo.region})`;
+        return `<div class="ac-row ${idx === state.highlightedIndex ? 'highlighted' : ''}" data-ac-idx="${idx}">
+          <div><div class="ac-row-title">${item.title}</div><div class="ac-row-sub">${subText}</div></div>
+          <span class="ac-row-badge">${item.isRemote ? 'PokéAPI' : 'Featured'}</span>
+        </div>`;
+      }).join('');
+      dd.classList.add('open');
+      dd.querySelectorAll('.ac-row').forEach(row => {
+        row.addEventListener('click', async () => {
+          const picked = state.searchResults[Number(row.getAttribute('data-ac-idx'))];
+          if (!picked) return;
+          dd.classList.remove('open');
+          document.getElementById('mainSearchInput').value = '';
+          const resolved = await resolveSelectedPokemon(picked);
+          if (resolved) submitGuess(resolved);
+        });
+      });
+    }
+
+    function handleSearchInput(val) {
+      const q = val.trim();
+      if (!q) { state.searchResults = []; state.highlightedIndex = -1; renderAutocompleteDropdown(); return; }
+      const nq = normalizeStr(q);
+
+      const localMatches = POKEMON_DB.filter(p => normalizeStr(p.title).includes(nq) || String(p.dex) === q);
+      const seenDex = new Set(localMatches.map(x => x.dex));
+      const remoteMatches = allPokeNamesIndex
+        .filter(p => !seenDex.has(p.dex) && (normalizeStr(p.title).includes(nq) || String(p.dex) === q))
+        .slice(0, 8);
+
+      state.searchResults = [...localMatches, ...remoteMatches].slice(0, 8);
+      state.highlightedIndex = state.searchResults.length ? 0 : -1;
+      renderAutocompleteDropdown();
+    }
+
+    function openSummaryModal(customReason = null) {
+      const t = state.target;
+      document.getElementById('summaryHeadline').textContent = state.won ? `🎉 Caught in ${state.guesses.length} of ${MAX_GUESSES}!` : (customReason || `⚡ Pokémon Revealed (${state.guesses.length}/${MAX_GUESSES})`);
+      const detailLine = `National Dex #${t.dex} • Gen ${t.gen} (${t.region}) • ${t.genres.join(' / ')} • ${t.stage} • ${t.bst} BST`;
+      document.getElementById('summaryRevealCard').innerHTML = `<div style="font-size: 0.7rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin-bottom: 4px;">SECRET MYSTERY POKÉMON</div><div style="font-size: 1.35rem; font-weight: 800; margin-bottom: 6px;">${t.title}</div><div style="font-size: 0.82rem; color: var(--text-secondary);">${detailLine}</div>`;
+      openModal('modalSummary');
+    }
+
+    function openChallengeBuilder() {
+      const sel = document.getElementById('challengeTargetSelect');
+      sel.innerHTML = POKEMON_DB.map(item => `<option value="${item.id}">#${item.dex} ${item.title} (Gen ${item.gen})</option>`).join('');
+      const updateLink = () => {
+        const payload = btoa(unescape(encodeURIComponent(JSON.stringify({ id: sel.value }))));
+        document.getElementById('challengeUrlOutput').value = `${window.location.href.split('#')[0]}#challenge=${payload}`;
+      };
+      sel.onchange = updateLink;
+      updateLink();
+      openModal('modalChallenge');
+    }
+
+    function renderGuideAndStats() {
+      const winPct = state.stats.played ? Math.round((state.stats.won / state.stats.played) * 100) : 0;
+      document.getElementById('statsSummaryGrid').innerHTML = `
+        <div class="stat-box"><div class="stat-num">${state.stats.played}</div><div class="stat-lbl">Played</div></div>
+        <div class="stat-box"><div class="stat-num">${winPct}%</div><div class="stat-lbl">Win %</div></div>
+        <div class="stat-box"><div class="stat-num">${state.stats.streak}</div><div class="stat-lbl">Streak</div></div>
+        <div class="stat-box"><div class="stat-num">${state.stats.maxStreak}</div><div class="stat-lbl">Max</div></div>
+      `;
+    }
+
+    function applyThemePrefs() {
+      document.body.setAttribute('data-palette', Prefs.palette);
+      document.body.setAttribute('data-accent', Prefs.accent);
+      document.body.setAttribute('data-font', Prefs.font);
+      document.body.classList.toggle('cinema-glow', Boolean(Prefs.cinemaGlow));
+      document.querySelectorAll('[data-palette-opt]').forEach(el => el.classList.toggle('active', el.getAttribute('data-palette-opt') === Prefs.palette));
+      document.querySelectorAll('[data-accent-opt]').forEach(el => el.classList.toggle('active', el.getAttribute('data-accent-opt') === Prefs.accent));
+      document.querySelectorAll('[data-font-opt]').forEach(el => el.classList.toggle('active', el.getAttribute('data-font-opt') === Prefs.font));
+    }
+
+    function bindEvents() {
+      document.getElementById('btnOpenLeftMenu').addEventListener('click', () => document.getElementById('leftDrawerBackdrop').classList.add('open'));
+      document.getElementById('btnCloseLeftMenu').addEventListener('click', () => document.getElementById('leftDrawerBackdrop').classList.remove('open'));
+      document.getElementById('leftDrawerBackdrop').addEventListener('click', e => { if (e.target.id === 'leftDrawerBackdrop') e.target.classList.remove('open'); });
+
+      document.getElementById('playModeSelect').addEventListener('change', e => {
+        state.playMode = e.target.value;
+        if (state.playMode === 'challenge') { document.getElementById('leftDrawerBackdrop').classList.remove('open'); openChallengeBuilder(); }
+        startNewRound();
+      });
+
+      document.getElementById('btnToggleFilterStudio').addEventListener('click', () => {
+        const card = document.getElementById('filterStudioCard');
+        card.style.display = card.style.display === 'none' ? 'flex' : 'none';
+      });
+
+      document.getElementById('btnResetPoolFilters').addEventListener('click', () => {
+        state.pokemonGens = []; state.stageFilter = 'All';
+        startNewRound(); showToast('✦ Pokédex Pool reset to Any Gen (1–9)');
+      });
+
+      document.getElementById('btnNewRandomRound').addEventListener('click', () => {
+        document.getElementById('leftDrawerBackdrop').classList.remove('open');
+        startNewRound(); showToast('🎲 New random Pokémon loaded!');
+      });
+
+      const searchInput = document.getElementById('mainSearchInput');
+      searchInput.addEventListener('input', e => handleSearchInput(e.target.value));
+      searchInput.addEventListener('keydown', async e => {
+        if (!state.searchResults.length) return;
+        if (e.key === 'ArrowDown') { e.preventDefault(); state.highlightedIndex = (state.highlightedIndex + 1) % state.searchResults.length; renderAutocompleteDropdown(); }
+        else if (e.key === 'ArrowUp') { e.preventDefault(); state.highlightedIndex = (state.highlightedIndex - 1 + state.searchResults.length) % state.searchResults.length; renderAutocompleteDropdown(); }
+        else if (e.key === 'Enter') {
+          e.preventDefault();
+          const picked = state.searchResults[state.highlightedIndex >= 0 ? state.highlightedIndex : 0];
+          if (picked) { document.getElementById('searchDropdown').classList.remove('open'); searchInput.value = ''; const resolved = await resolveSelectedPokemon(picked); if (resolved) submitGuess(resolved); }
+        }
+      });
+
+      document.addEventListener('click', e => { if (!e.target.closest('.search-input-shell')) document.getElementById('searchDropdown').classList.remove('open'); });
+
+      document.getElementById('btnHintTrigger').addEventListener('click', () => {
+        if (state.gameOver) return;
+        const subtleAllowed = canTriggerHint(), ostReady = canTriggerOst();
+        const opts = buildClueOptions(state.target);
+        const usedIds = new Set(state.revealedHints.map(h => h.id));
+        const listEl = document.getElementById('hintsOptionList');
+
+        listEl.innerHTML = `
+          <div class="hint-choice-row" id="hintModalAiBtn" style="border-color: var(--accent-border); background: var(--accent-soft);">
+            <div><div style="font-weight: 800; font-size: 0.92rem; color: var(--accent);">✨ Ask Google Search AI Clue</div><div style="font-size: 0.77rem; color: var(--text-secondary);">Generates a live, spoiler-free Pokédex lore clue grounded in Google Search</div></div>
+            <span class="ac-row-badge" id="hintModalAiBadge">Ask AI</span>
+          </div>
+          <div class="hint-choice-row ${!ostReady && !state.ostUnlocked ? 'used' : ''}" id="hintModalOstBtn">
+            <div><div style="font-weight: 800; font-size: 0.92rem;">🔊 12s Mystery Poké-Theme Synth Clip</div><div style="font-size: 0.77rem; color: var(--text-secondary);">Unlocks on Guess 5 to hear a 12-second melodic motif</div></div>
+            <span class="ac-row-badge">${state.ostUnlocked ? 'Active' : ostReady ? 'Play Theme' : `Guess ${OST_UNLOCK_AT}`}</span>
+          </div>
+          ${opts.map(o => {
+            const used = usedIds.has(o.id), locked = !used && !subtleAllowed;
+            const badgeTxt = used ? 'Used' : locked ? (state.guesses.length < 2 ? 'Guess 3+' : '1/Guess') : 'Reveal';
+            return `<div class="hint-choice-row ${used || locked ? 'used' : ''}" data-cid="${o.id}">
+              <div><div style="font-weight: 800; font-size: 0.9rem;">${o.title}</div><div style="font-size: 0.77rem; color: var(--text-secondary);">${o.desc}</div></div>
+              <span class="ac-row-badge">${badgeTxt}</span>
+            </div>`;
+          }).join('')}
+        `;
+
+        document.getElementById('hintModalAiBtn')?.addEventListener('click', async () => {
+          const btn = document.getElementById('hintModalAiBtn');
+          if (btn.dataset.loading === '1') return;
+          btn.dataset.loading = '1';
+          document.getElementById('hintModalAiBadge').textContent = 'Searching...';
+          const aiClue = await GoogleSearchVerifier.generateGroundedClue(state.target);
+          btn.dataset.loading = '0';
+          document.getElementById('hintModalAiBadge').textContent = 'Ask AI';
+          if (aiClue) {
+            state.revealedHints.push({ id: `ai_${Date.now()}`, title: '✨ Google Search AI Clue', value: aiClue });
+            closeModal('modalHints'); renderAll(); showToast('✨ Grounded Google AI clue revealed!');
+          } else showToast('Could not fetch AI clue right now.');
+        });
+
+        const ostTrigger = document.getElementById('hintModalOstBtn');
+        if (ostTrigger && (ostReady || state.ostUnlocked)) {
+          ostTrigger.addEventListener('click', () => { state.ostUnlocked = true; closeModal('modalHints'); renderAll(); OstAudio.play(state.target.notes); });
+        }
+
+        listEl.querySelectorAll('.hint-choice-row[data-cid]:not(.used)').forEach(row => {
+          row.addEventListener('click', () => {
+            if (!canTriggerHint()) return;
+            const picked = opts.find(x => x.id === row.getAttribute('data-cid'));
+            if (!picked) return;
+            state.revealedHints.push(picked);
+            state.lastHintGuessCount = state.guesses.length;
+            closeModal('modalHints'); renderAll(); showToast('💡 Pokédex clue unlocked!');
+          });
+        });
+
+        openModal('modalHints');
+      });
+
+      document.getElementById('btnOstPlay').addEventListener('click', () => OstAudio.play(state.target.notes));
+      document.getElementById('btnOstStop').addEventListener('click', () => OstAudio.stop());
+      document.getElementById('btnGiveUp').addEventListener('click', () => { if (!state.gameOver) finishRound(false, '🏳️ Round Conceded'); });
+
+      document.querySelectorAll('.preset-sec-btn').forEach(btn => btn.addEventListener('click', () => { document.getElementById('customSecondsInput').value = btn.getAttribute('data-sec'); startNewRound(); }));
+      document.getElementById('btnStartTimerRound').addEventListener('click', () => startNewRound());
+
+      document.getElementById('btnPrevTip').addEventListener('click', () => { state.tipIndex = (state.tipIndex - 1 + ROTATING_TIPS.length) % ROTATING_TIPS.length; renderTipCarousel(); });
+      document.getElementById('btnNextTip').addEventListener('click', () => { state.tipIndex = (state.tipIndex + 1) % ROTATING_TIPS.length; renderTipCarousel(); });
+      document.getElementById('btnBottomHowTo').addEventListener('click', () => { renderGuideAndStats(); document.getElementById('drawerBackdrop').classList.add('open'); });
+      document.getElementById('btnOpenGuideDrawer').addEventListener('click', () => { renderGuideAndStats(); document.getElementById('drawerBackdrop').classList.add('open'); });
+      document.getElementById('btnCloseGuideDrawer').addEventListener('click', () => document.getElementById('drawerBackdrop').classList.remove('open'));
+      document.getElementById('drawerBackdrop').addEventListener('click', e => { if (e.target.id === 'drawerBackdrop') e.target.classList.remove('open'); });
+
+      document.getElementById('btnOpenSettings').addEventListener('click', () => openModal('modalSettings'));
+      document.getElementById('btnViewRoundSummary').addEventListener('click', () => openSummaryModal());
+
+      document.querySelectorAll('[data-palette-opt]').forEach(btn => btn.addEventListener('click', () => { Prefs.palette = btn.getAttribute('data-palette-opt'); applyThemePrefs(); }));
+      document.querySelectorAll('[data-accent-opt]').forEach(btn => btn.addEventListener('click', () => { Prefs.accent = btn.getAttribute('data-accent-opt'); applyThemePrefs(); }));
+      document.querySelectorAll('[data-font-opt]').forEach(btn => btn.addEventListener('click', () => { Prefs.font = btn.getAttribute('data-font-opt'); applyThemePrefs(); }));
+      document.getElementById('chkCinemaGlow').addEventListener('change', e => { Prefs.cinemaGlow = e.target.checked; applyThemePrefs(); });
+
+      document.getElementById('btnSaveGeminiOverride').addEventListener('click', () => {
+        const val = document.getElementById('inputGeminiKeyOverride').value.trim();
+        if (val) { Prefs.geminiKeyOverride = val; document.getElementById('geminiKeyStatusBadge').textContent = 'Custom Gemini Key Active'; showToast('Custom Gemini key saved.'); }
+      });
+      document.getElementById('btnResetGeminiOverride').addEventListener('click', () => {
+        Prefs.geminiKeyOverride = ''; document.getElementById('inputGeminiKeyOverride').value = '';
+        document.getElementById('geminiKeyStatusBadge').textContent = 'Built-in Workspace AI Active'; showToast('Restored built-in Workspace AI.');
+      });
+
+      document.getElementById('btnSummaryNextRound').addEventListener('click', () => { closeModal('modalSummary'); startNewRound(); });
+      document.getElementById('btnShareResultGrid').addEventListener('click', () => {
+        const rows = state.guesses.map(g => (g.dex === state.target.dex || normalizeStr(g.title) === normalizeStr(state.target.title)) ? '🟩🟩🟩🟩🟩' : '🟨⬛🟩⬛🟨').join('\n');
+        const ta = document.createElement('textarea');
+        ta.value = `PokéSpotle — ${state.won ? `${state.guesses.length}/10` : 'X/10'}\n${rows}`;
+        document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+        showToast('📋 Result grid copied!');
+      });
+      document.getElementById('btnCopyChallengeLink').addEventListener('click', () => {
+        const inp = document.getElementById('challengeUrlOutput'); inp.select(); document.execCommand('copy'); showToast('📋 Challenge link copied!');
+      });
+
+      document.querySelectorAll('[data-close]').forEach(btn => btn.addEventListener('click', () => closeModal(btn.getAttribute('data-close'))));
+      document.querySelectorAll('.modal-overlay').forEach(ov => ov.addEventListener('click', e => { if (e.target === ov) ov.classList.remove('open'); }));
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      applyThemePrefs();
+      bindEvents();
+      preloadPokeApiIndex();
+      try {
+        const hash = window.location.hash || '';
+        if (hash.startsWith('#challenge=')) {
+          const decoded = JSON.parse(decodeURIComponent(escape(atob(hash.slice('#challenge='.length)))));
+          const found = POKEMON_DB.find(x => x.id === decoded?.id);
+          if (found) { state.playMode = 'challenge'; startNewRound(found); showToast('⚔️ Pokémon Challenge loaded!'); return; }
+        }
+      } catch (_) {}
+      startNewRound();
+    });
+  </script>
+</body>
+</html>
